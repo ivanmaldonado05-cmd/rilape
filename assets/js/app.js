@@ -131,7 +131,7 @@
         '<div id="delivery-map" role="application" aria-label="Mapa para marcar el punto de entrega"></div>' +
         '<p class="map-hint" data-map-status><span>Tocá el mapa o arrastrá el marcador.</span></p>' +
       '</div>' +
-      '<button class="btn btn--wa btn--block btn--lg" data-send>' + ICON.wa + 'Finalizar pedido por WhatsApp</button>' +
+      '<button class="btn btn--wa btn--block" data-send>' + ICON.wa + 'Finalizar pedido por WhatsApp</button>' +
       '<button class="btn btn--ghost btn--block" style="margin-top:.6rem" data-clear>Vaciar pedido</button>';
   }
 

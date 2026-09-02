@@ -33,21 +33,29 @@ heroMap["p05_01"] = heroMap["p05_01"] || "home"; // decorativas also used as hom
 for (const [src, slug] of Object.entries(heroMap)) {
   const f = `${EX}/${src}.png`;
   if (!fs.existsSync(f)) { console.log("hero missing", src); continue; }
+  if (slug === "home") continue; // el hero de inicio se genera aparte (imagen propia)
   const meta = await sharp(f).metadata();
-  // take the top 66% of the image, full width, then center-crop to 16:9
-  const cropH = Math.round(meta.height * 0.66);
+  // recorte por contenido: sacar el 12% inferior (donde el catálogo tiene el nombre de la
+  // categoría impreso) y dejar que sharp encuentre la zona con más detalle (el sujeto).
+  const cropH = Math.round(meta.height * 0.88);
   const slice = await sharp(f).extract({ left: 0, top: 0, width: meta.width, height: cropH }).flatten({ background: "#efe7db" }).toBuffer();
-  await sharp(slice).resize(1600, 720, { fit: "cover", position: "top" }).webp({ quality: 80 }).toFile(`${OUTH}/${slug}.webp`);
-  await sharp(slice).resize(1600, 720, { fit: "cover", position: "top" }).jpeg({ quality: 80, progressive: true }).toFile(`${OUTH}/${slug}.jpg`);
+  await sharp(slice).resize(1600, 900, { fit: "cover", position: sharp.strategy.attention }).webp({ quality: 80 }).toFile(`${OUTH}/${slug}.webp`);
+  await sharp(slice).resize(1600, 900, { fit: "cover", position: sharp.strategy.attention }).jpeg({ quality: 80, progressive: true }).toFile(`${OUTH}/${slug}.jpg`);
 }
 
-// dedicated tall home hero from decorativas lifestyle (p05)
+// Home hero — DESKTOP: imagen propia landscape (mucho aire a la derecha para el titular)
+{
+  const desk = "_build/src/home-desktop.jpg";
+  await sharp(desk).resize(1800).webp({ quality: 84 }).toFile(`${OUTH}/home.webp`);
+  await sharp(desk).resize(1800).jpeg({ quality: 86, progressive: true }).toFile(`${OUTH}/home.jpg`);
+}
+// Home hero — MOBILE: la foto original vertical (decorativas p05), sin el texto de abajo
 {
   const f = `${EX}/p05_01.png`;
   const meta = await sharp(f).metadata();
-  const cropH = Math.round(meta.height * 0.62);
-  const slice = await sharp(f).extract({ left: 0, top: 0, width: meta.width, height: cropH }).flatten({ background: "#efe7db" }).toBuffer();
-  await sharp(slice).resize(2000, 1500, { fit: "cover", position: "top" }).webp({ quality: 82 }).toFile(`${OUTH}/home.webp`);
-  await sharp(slice).resize(2000, 1500, { fit: "cover", position: "top" }).jpeg({ quality: 82, progressive: true }).toFile(`${OUTH}/home.jpg`);
+  const cropH = Math.round(meta.height * 0.74);
+  const slice = await sharp(f).extract({ left: 0, top: 0, width: meta.width, height: cropH }).toBuffer();
+  await sharp(slice).resize(1080, 1440, { fit: "cover", position: "top" }).webp({ quality: 82 }).toFile(`${OUTH}/home-mobile.webp`);
+  await sharp(slice).resize(1080, 1440, { fit: "cover", position: "top" }).jpeg({ quality: 82, progressive: true }).toFile(`${OUTH}/home-mobile.jpg`);
 }
 console.log("heroes done");
