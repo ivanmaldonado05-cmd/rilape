@@ -19,12 +19,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=13">
+<link rel="stylesheet" href="assets/css/style.css?v=14">
 </head>
 <body>
 
 <header class="site-header">
   <div class="wrap header-inner">
+    <input class="menu-cb" type="checkbox" id="menu-cb" aria-hidden="true">
     <a class="brand" href="index.html" aria-label="Rilape Velas — Inicio"><span class="brand-logo" role="img" aria-label="Velas Rilape"></span></a>
     <nav class="nav" data-nav aria-label="Principal">
       <a href="index.html">Inicio</a>
@@ -37,10 +38,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.3a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/><circle cx="9.5" cy="20" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="20" r="1.2" fill="currentColor" stroke="none"/></svg>
         <span class="cart-count" data-cart-count>0</span>
       </button>
-      <button class="icon-btn nav-toggle" data-nav-toggle aria-label="Menú">
+      <label class="icon-btn nav-toggle" for="menu-cb" role="button" tabindex="0" aria-label="Menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      </label>
     </div>
+    <label class="nav-scrim" for="menu-cb" aria-hidden="true"></label>
   </div>
 </header>
 
@@ -115,8 +117,8 @@
 </footer>
 
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
-<script src="assets/js/data.js?v=13"></script>
-<script src="assets/js/store.js?v=13"></script>
-<script src="assets/js/app.js?v=13"></script>
+<script src="assets/js/data.js?v=14"></script>
+<script src="assets/js/store.js?v=14"></script>
+<script src="assets/js/app.js?v=14"></script>
 </body>
 </html>
