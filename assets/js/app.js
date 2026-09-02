@@ -81,9 +81,14 @@
       var onScroll = function () { h.classList.toggle("scrolled", window.scrollY > 8); };
       onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
     }
-    // El toggle del menú se maneja en la delegación global (initDelegation).
+    // Enlace directo (además de la delegación global) — más fiable en móviles reales,
+    // donde tocar el <svg> dentro del botón a veces no dispara el click delegado.
+    $$("[data-nav-toggle]").forEach(function (b) { b.addEventListener("click", toggleNav); });
+    $$("[data-cart-open]").forEach(function (b) { b.addEventListener("click", function (e) { e.preventDefault(); openCart(); }); });
   }
+  var _lastNav = 0;
   function toggleNav() {
+    var now = Date.now(); if (now - _lastNav < 60) return; _lastNav = now; // dedup del mismo click (directo + delegación)
     var nav = $("[data-nav]"), scrim = $("[data-scrim]");
     if (!nav) return;
     var open = nav.classList.toggle("open");

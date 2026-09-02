@@ -44,6 +44,8 @@ img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 a, button, .chip, .subchip, .seg button, .qty button, label.search { touch-action: manipulation; }
+/* el toque cae en el botón/enlace, no en el ícono (fix iOS: el tap sobre el SVG no disparaba el click) */
+button svg, a svg { pointer-events: none; }
 /* paneles cerrados nunca deben interceptar toques (fix mobile) */
 .drawer:not(.open), .overlay:not(.open), .scrim:not(.open) { pointer-events: none; }
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; margin: 0; letter-spacing: .005em; }
