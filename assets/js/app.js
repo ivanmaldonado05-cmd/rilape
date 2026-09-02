@@ -45,8 +45,10 @@
       '<a class="wa-float" data-wa-float href="#" aria-label="Escribinos por WhatsApp" target="_blank" rel="noopener">' + ICON.wa + '</a>' +
       '<aside class="drawer" data-drawer aria-label="Tu pedido" aria-hidden="true">' +
         '<div class="drawer__head"><h3>Tu pedido</h3><button class="icon-btn" data-cart-close aria-label="Cerrar">' + ICON.close + '</button></div>' +
-        '<div class="drawer__body" data-cart-body></div>' +
-        '<div class="drawer__foot" data-cart-foot hidden></div>' +
+        '<div class="drawer__scroll">' +
+          '<div class="drawer__body" data-cart-body></div>' +
+          '<div class="drawer__foot" data-cart-foot hidden></div>' +
+        '</div>' +
       '</aside>' +
       '<div class="overlay" data-modal aria-hidden="true"><div class="modal" role="dialog" aria-modal="true"><button class="modal__close" data-modal-close aria-label="Cerrar">' + ICON.close + '</button><div data-modal-content></div></div></div>' +
       '<div class="toast" data-toast></div>';
@@ -62,6 +64,17 @@
   }
 
   /* ---------- header behaviour ---------- */
+  function initHeroVideo() {
+    var v = $(".hero__video"); if (!v) return;
+    v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
+    var tryPlay = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    tryPlay();
+    v.addEventListener("canplay", tryPlay, { once: true });
+    // reintento tras interacción por si el navegador bloquea el autoplay
+    document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
+    document.addEventListener("scroll", tryPlay, { once: true, passive: true });
+    document.addEventListener("click", tryPlay, { once: true });
+  }
   function initHeader() {
     var h = $(".site-header");
     if (h) {
@@ -279,6 +292,15 @@
     var feat = D.products.filter(function (p) { return p.feat; }).slice(0, 8);
     host.innerHTML = feat.map(cardHtml).join("");
   }
+  function initCtaCarousel() {
+    var host = $("[data-cta-carousel]"); if (!host) return;
+    var feat = D.products.filter(function (p) { return p.feat; }).slice(0, 6);
+    if (feat.length < 3) feat = D.products.slice(0, 6);
+    var block = feat.map(function (p) {
+      return '<div class="cta-slide">' + imgTag(p) + '<span>' + esc(p.name) + '</span></div>';
+    }).join("");
+    host.innerHTML = block + block; // duplicado para loop continuo
+  }
   function initCategoryCards() {
     var host = $("[data-cat-cards]"); if (!host) return;
     host.innerHTML = D.categories.map(function (c) {
@@ -383,9 +405,11 @@
   /* ---------- boot ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     injectShared();
+    initHeroVideo();
     initHeader();
     initDelegation();
     initFeatured();
+    initCtaCarousel();
     initCategoryCards();
     initCatalog();
     Cart.onChange(function () { renderBadge(); if ($("[data-drawer]").classList.contains("open")) renderCart(); });

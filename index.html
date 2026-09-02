@@ -52,6 +52,9 @@
 <main>
   <!-- HERO -->
   <section class="hero">
+    <video class="hero__video" autoplay muted loop playsinline preload="auto" poster="assets/img/hero/home.jpg" aria-hidden="true">
+      <source src="assets/video/hero.mp4" type="video/mp4">
+    </video>
     <div class="wrap">
       <div class="hero__inner">
         <p class="eyebrow">Desde 1981 · Asunción, Paraguay</p>
@@ -119,12 +122,18 @@
   </section>
 
   <!-- CTA -->
-  <section class="section center">
-    <div class="wrap">
-      <hr class="rule" style="margin-inline:auto">
-      <h2 style="font-size:clamp(2rem,4.4vw,3rem);max-width:16ch;margin:0 auto 1rem">¿Listo para armar tu pedido?</h2>
-      <p class="muted" style="max-width:52ch;margin:0 auto 2rem">Elegí tus velas, sumalas al pedido y envialo por WhatsApp en un clic. Coordinamos retiro en el local o delivery.</p>
-      <a class="btn btn--gold btn--lg" href="catalogo.html">Empezar mi pedido</a>
+  <section class="section cta-section">
+    <div class="wrap cta-split">
+      <div class="cta-copy">
+        <hr class="rule">
+        <p class="eyebrow">Tu pedido en un clic</p>
+        <h2>¿Listo para armar tu pedido?</h2>
+        <p class="muted">Elegí tus velas, sumalas al pedido y envialo por WhatsApp en un clic. Coordinamos retiro en el local o delivery.</p>
+        <a class="btn btn--gold btn--lg" href="catalogo.html">Empezar mi pedido</a>
+      </div>
+      <div class="cta-carousel" aria-hidden="true">
+        <div class="cta-marquee" data-cta-carousel></div>
+      </div>
     </div>
   </section>
 </main>

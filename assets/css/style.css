@@ -43,6 +43,9 @@ body {
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
+a, button, .chip, .subchip, .seg button, .qty button, label.search { touch-action: manipulation; }
+/* paneles cerrados nunca deben interceptar toques (fix mobile) */
+.drawer:not(.open), .overlay:not(.open), .scrim:not(.open) { pointer-events: none; }
 h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; margin: 0; letter-spacing: .005em; }
 .serif { font-family: var(--serif); }
 
@@ -127,11 +130,14 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
   display: flex; align-items: center;
   background: var(--sand) center/cover no-repeat;
   background-image: url(../img/hero/home.jpg);
+  overflow: hidden;
 }
+.hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 @media (max-width: 760px) {
   .hero { min-height: min(82vh, 680px); background-image: url(../img/hero/home-mobile.jpg); }
+  .hero__video { display: none; }
 }
-.hero::after { content: ""; position: absolute; inset: 0;
+.hero::after { content: ""; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(100deg, rgba(40,32,22,.42) 0%, rgba(40,32,22,.14) 42%, rgba(40,32,22,0) 66%); }
 .hero__inner { position: relative; z-index: 2; max-width: 620px; color: #fff; padding: 4rem 0; }
 .hero__inner .eyebrow { color: #f2e3c4; }
@@ -256,6 +262,26 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 .story-copy p { color: var(--ink-soft); margin: 0 0 1rem; }
 .band .story-copy p { color: #d8ccba; }
 
+/* CTA con carrusel vertical automático */
+.cta-split { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(2rem,5vw,4.5rem); align-items: center; }
+.cta-copy .rule { margin: 0 0 1.2rem; }
+.cta-copy h2 { font-size: clamp(2rem,4.4vw,3rem); max-width: 14ch; }
+.cta-copy p { margin: 1rem 0 2rem; max-width: 46ch; }
+.cta-carousel { position: relative; height: 480px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+          mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); }
+.cta-marquee { display: flex; flex-direction: column; gap: 18px; animation: cta-scroll 34s linear infinite; will-change: transform; }
+.cta-carousel:hover .cta-marquee { animation-play-state: paused; }
+.cta-slide { position: relative; background: var(--ivory); border: 1px solid var(--line-soft);
+  border-radius: var(--radius); aspect-ratio: 5/4; display: flex; align-items: center; justify-content: center;
+  padding: 9% 12% 15%; box-shadow: var(--shadow-sm); }
+.cta-slide img { max-height: 100%; width: auto; object-fit: contain; }
+.cta-slide span { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center;
+  font-family: var(--serif); font-size: 1.05rem; color: var(--ink-soft); }
+@keyframes cta-scroll { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+@media (max-width: 760px) { .cta-split { grid-template-columns: 1fr; } .cta-carousel { height: 360px; } }
+@media (prefers-reduced-motion: reduce) { .cta-marquee { animation: none; } }
+
 /* ---------- Modal (product) ---------- */
 .overlay {
   position: fixed; inset: 0; z-index: 500; background: rgba(30,22,14,.55);
@@ -304,7 +330,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 
 /* ---------- Cart drawer ---------- */
 .drawer {
-  position: fixed; top: 0; right: 0; height: 100%; width: min(430px, 100%); z-index: 600;
+  position: fixed; top: 0; right: 0; bottom: 0; height: auto; width: min(430px, 100%); z-index: 600;
   background: var(--cream-2); box-shadow: var(--shadow-lg); display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform .34s cubic-bezier(.4,0,.2,1);
 }
@@ -312,7 +338,8 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 .drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 1.3rem 1.4rem;
   border-bottom: 1px solid var(--line); }
 .drawer__head h3 { font-size: 1.5rem; }
-.drawer__body { flex: 1; overflow-y: auto; padding: 1.2rem 1.4rem; }
+.drawer__scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.drawer__body { padding: 1.2rem 1.4rem; }
 .drawer__foot { border-top: 1px solid var(--line); padding: 1.2rem 1.4rem; background: var(--cream); }
 
 .cart-item { display: grid; grid-template-columns: 66px 1fr auto; gap: .9rem; align-items: center;
@@ -415,7 +442,8 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
     padding: calc(var(--header-h) + 1.5rem) 2rem 2rem; gap: 1.6rem; transform: translateX(100%);
     transition: transform .32s ease; box-shadow: var(--shadow-lg);
   }
-  .nav.open { transform: none; }
+  .nav:not(.open) { pointer-events: none; }
+  .nav.open { transform: none; pointer-events: auto; }
   .nav a { font-size: 1rem; }
   .nav-toggle { display: inline-flex; }
   .strip__grid { grid-template-columns: 1fr; gap: 1.5rem; }
@@ -423,6 +451,18 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
   .search input { width: 100%; }
   .search { width: 100%; order: 3; }
   .toolbar__row { gap: .6rem; }
+  /* en mobile las categorías no siguen la pantalla al scrollear */
+  .toolbar { position: static; top: auto; }
+  /* modal de producto: empezar desde arriba y poder scrollear todo el contenido */
+  .overlay { align-items: flex-start; padding: 10px; }
+  .modal { max-height: calc(100dvh - 20px); }
+  .modal__media { padding: 1.4rem; }
+  .modal__media img { max-height: 230px; }
+}
+@media (max-width: 560px) {
+  /* en mobile la tarjeta se abre tocando la foto: ocultamos el ojo (evita el recorte) */
+  .card__view { display: none; }
+  .card__foot .btn { padding: .78em 1em; }
 }
 @media (max-width: 420px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; }
