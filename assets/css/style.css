@@ -138,9 +138,11 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
   overflow: hidden;
 }
 .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.hero__video--mobile { display: none; }
 @media (max-width: 760px) {
   .hero { min-height: min(82vh, 680px); background-image: url(../img/hero/home-mobile.jpg); }
-  .hero__video { display: none; }
+  .hero__video--desktop { display: none; }
+  .hero__video--mobile { display: block; }
 }
 .hero::after { content: ""; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(100deg, rgba(40,32,22,.42) 0%, rgba(40,32,22,.14) 42%, rgba(40,32,22,0) 66%); }

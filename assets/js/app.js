@@ -65,11 +65,15 @@
 
   /* ---------- header behaviour ---------- */
   function initHeroVideo() {
-    var v = $(".hero__video"); if (!v) return;
-    v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
-    var tryPlay = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    var vids = $$(".hero__video"); if (!vids.length) return;
+    var tryPlay = function () {
+      vids.forEach(function (v) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); });
+    };
+    vids.forEach(function (v) {
+      v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
+      v.addEventListener("canplay", tryPlay, { once: true });
+    });
     tryPlay();
-    v.addEventListener("canplay", tryPlay, { once: true });
     // reintento tras interacción por si el navegador bloquea el autoplay
     document.addEventListener("touchstart", tryPlay, { once: true, passive: true });
     document.addEventListener("scroll", tryPlay, { once: true, passive: true });
