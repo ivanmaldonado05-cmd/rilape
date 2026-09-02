@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rilape",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["_build/serve.mjs"],
+      "port": 5057
+    }
+  ]
+}
