@@ -331,6 +331,13 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 .frag-list { display: flex; flex-wrap: wrap; gap: .4rem; }
 .frag-list span { font-size: .78rem; background: var(--ivory); border: 1px solid var(--line-soft);
   padding: .28em .7em; border-radius: 999px; color: var(--ink-soft); }
+/* selectores de tamaño / color / fragancia en el modal */
+.opt-list { display: flex; flex-wrap: wrap; gap: .45rem; }
+.opt { font-size: .82rem; background: var(--ivory); border: 1px solid var(--line); color: var(--ink-soft);
+  padding: .45em .95em; border-radius: 999px; transition: all .18s; }
+.opt:hover { border-color: var(--gold); color: var(--gold-deep); }
+.opt.active { background: var(--gold-tint); border-color: var(--gold); color: var(--gold-deep); font-weight: 500; }
+.modal__req { font-size: .76rem; color: #b5482f; margin: .7rem 0 0; }
 .spec-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
 .spec-table th { text-align: left; font-weight: 500; color: var(--ink-faint); font-size: .68rem;
   letter-spacing: .08em; text-transform: uppercase; padding: .5em .6em; border-bottom: 1px solid var(--line); }

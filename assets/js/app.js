@@ -121,10 +121,14 @@
   }
   function cartRowHtml(item) {
     var p = byId[item.id]; if (!p) return "";
-    return '<div class="cart-item" data-row="' + p.id + '">' +
+    var opts = [];
+    if (item.size) opts.push(esc(item.size));
+    if (item.frag) opts.push(esc(item.frag));
+    var sub = opts.length ? opts.join(" · ") : (esc(catName[p.cat] || "") + (p.sub ? " · " + esc(p.sub) : ""));
+    return '<div class="cart-item" data-row="' + esc(Cart.keyOf(item)) + '">' +
       '<div class="cart-item__img">' + imgTag(p) + '</div>' +
       '<div><div class="cart-item__name">' + esc(p.name) + '</div>' +
-      '<div class="cart-item__sub">' + esc(catName[p.cat] || "") + (p.sub ? ' · ' + esc(p.sub) : '') + '</div>' +
+      '<div class="cart-item__sub">' + sub + '</div>' +
       '<div class="cart-item__qty"><button data-dec aria-label="Menos">' + ICON.minus + '</button><span>' + item.qty + '</span><button data-inc aria-label="Más">' + ICON.plus + '</button></div></div>' +
       '<button class="cart-item__remove" data-remove aria-label="Quitar">' + ICON.trash + '</button></div>';
   }
@@ -217,7 +221,12 @@
     var name = ($("[data-ck-name]") || {}).value || "";
     var lines = ["Hola Rilape, quiero hacer un pedido:"];
     items.forEach(function (it) {
-      var p = byId[it.id]; if (p) lines.push("• " + p.name + " x" + it.qty);
+      var p = byId[it.id]; if (!p) return;
+      var opts = [];
+      if (it.size) opts.push(it.size);
+      if (it.frag) opts.push(it.frag);
+      var detail = opts.length ? " (" + opts.join(", ") + ")" : "";
+      lines.push("• " + p.name + detail + " x" + it.qty);
     });
     lines.push("");
     if (checkout.mode === "delivery") {
@@ -252,35 +261,80 @@
       "<th>Peso</th><th>Cant.</th><th>Altura</th><th>Diám.</th><th>Duración</th></tr></thead><tbody>" +
       rows + "</tbody></table></div></div>";
   }
-  function fragBlock(p) {
-    if (!p.frag) return "";
-    var items = p.frag.split(/,|·/).map(function (s) { return s.trim(); }).filter(Boolean);
-    return '<div class="modal__block"><h4>Variaciones / Fragancias</h4><div class="frag-list">' +
-      items.map(function (f) { return "<span>" + esc(f) + "</span>"; }).join("") + "</div></div>";
+  function fragList(p) {
+    return p.frag ? p.frag.split(/,|·/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
+  }
+  function hasOptions(p) {
+    return (p.sizes && p.sizes.length > 1) || fragList(p).length > 1;
+  }
+  function optionsBlock(p) {
+    var html = "", fl = fragList(p);
+    if (p.sizes && p.sizes.length > 1) {
+      html += '<div class="modal__block"><h4>Elegí el tamaño</h4><div class="opt-list" data-size-opts>' +
+        p.sizes.map(function (s) { return '<button type="button" class="opt" data-size="' + esc(s.n) + '">' + esc(s.n) + '</button>'; }).join("") +
+        '</div></div>';
+    }
+    if (fl.length > 1) {
+      html += '<div class="modal__block"><h4>Elegí color o fragancia</h4><div class="opt-list" data-frag-opts>' +
+        fl.map(function (f) { return '<button type="button" class="opt" data-frag="' + esc(f) + '">' + esc(f) + '</button>'; }).join("") +
+        '</div></div>';
+    } else if (fl.length === 1) {
+      html += '<div class="modal__block"><h4>Variaciones / Fragancias</h4><div class="frag-list"><span>' + esc(fl[0]) + '</span></div></div>';
+    }
+    return html;
   }
   function openModal(id) {
     var p = byId[id]; if (!p) return;
+    var fl = fragList(p);
+    var needSize = !!(p.sizes && p.sizes.length > 1);
+    var needFrag = fl.length > 1;
+    var sel = { size: needSize ? null : "", frag: needFrag ? null : (fl[0] || "") };
     var html =
       '<div class="modal__grid"><div class="modal__media">' + imgTag(p) + '</div>' +
       '<div class="modal__info"><p class="eyebrow">' + esc(catName[p.cat] || "") + (p.sub ? ' · ' + esc(p.sub) : '') + '</p>' +
       '<h2>' + esc(p.name) + '</h2>' +
-      fragBlock(p) + specTable(p) +
+      optionsBlock(p) + specTable(p) +
       (p.note ? '<p class="note">' + esc(p.note) + '</p>' : '') +
       '<div class="modal__buy">' +
         '<div class="qty"><button data-mq-dec aria-label="Menos">' + ICON.minus + '</button><input data-mq type="text" inputmode="numeric" value="1" aria-label="Cantidad"><button data-mq-inc aria-label="Más">' + ICON.plus + '</button></div>' +
         '<button class="btn btn--gold" data-modal-add>' + ICON.cart + 'Agregar al pedido</button>' +
-      '</div></div></div>';
+      '</div>' +
+      ((needSize || needFrag) ? '<p class="modal__req" data-req>Elegí ' + (needSize && needFrag ? 'tamaño y color/fragancia' : (needSize ? 'un tamaño' : 'un color o fragancia')) + ' para continuar.</p>' : '') +
+      '</div></div>';
     $("[data-modal-content]").innerHTML = html;
     var mo = $("[data-modal]"); mo.classList.add("open"); mo.setAttribute("aria-hidden", "false");
-    var q = $("[data-mq]");
+    mo.scrollTop = 0; var md = $(".modal", mo); if (md) md.scrollTop = 0;
+    var q = $("[data-mq]"), addBtn = $("[data-modal-add]"), req = $("[data-req]");
     var clamp = function () { var v = parseInt(q.value, 10); q.value = (!v || v < 1) ? 1 : Math.min(v, 999); };
+    function refresh() {
+      var ok = (!needSize || sel.size) && (!needFrag || sel.frag);
+      addBtn.disabled = !ok;
+      if (req) req.style.display = ok ? "none" : "block";
+    }
     $("[data-mq-dec]").onclick = function () { q.value = Math.max(1, (parseInt(q.value, 10) || 1) - 1); };
     $("[data-mq-inc]").onclick = function () { q.value = Math.min(999, (parseInt(q.value, 10) || 1) + 1); };
     q.onchange = clamp; q.oninput = function () { q.value = q.value.replace(/[^0-9]/g, ""); };
-    $("[data-modal-add]").onclick = function () {
-      clamp(); Cart.add(p.id, parseInt(q.value, 10) || 1);
+    var sizeWrap = $("[data-size-opts]");
+    if (sizeWrap) sizeWrap.onclick = function (e) {
+      var b = e.target.closest("[data-size]"); if (!b) return;
+      sel.size = b.getAttribute("data-size");
+      $$("[data-size]", sizeWrap).forEach(function (x) { x.classList.toggle("active", x === b); });
+      refresh();
+    };
+    var fragWrap = $("[data-frag-opts]");
+    if (fragWrap) fragWrap.onclick = function (e) {
+      var b = e.target.closest("[data-frag]"); if (!b) return;
+      sel.frag = b.getAttribute("data-frag");
+      $$("[data-frag]", fragWrap).forEach(function (x) { x.classList.toggle("active", x === b); });
+      refresh();
+    };
+    addBtn.onclick = function () {
+      if (addBtn.disabled) return;
+      clamp();
+      Cart.add(p.id, parseInt(q.value, 10) || 1, sel.size || "", sel.frag || "");
       closeModal(); toast("Agregado: " + p.name); openCart();
     };
+    refresh();
   }
   function closeModal() { var m = $("[data-modal]"); if (m) { m.classList.remove("open"); m.setAttribute("aria-hidden", "true"); } }
 
@@ -397,11 +451,17 @@
       var open = e.target.closest("[data-open]");
       if (open) { openModal(open.getAttribute("data-open")); return; }
       var add = e.target.closest("[data-add]");
-      if (add) { var p = byId[add.getAttribute("data-add")]; Cart.add(add.getAttribute("data-add"), 1); toast("Agregado: " + (p ? p.name : "")); renderBadge(); return; }
+      if (add) {
+        var aid = add.getAttribute("data-add"), ap = byId[aid];
+        if (ap && hasOptions(ap)) { openModal(aid); return; }   // pedir tamaño/color antes
+        var afl = ap ? fragList(ap) : [];
+        Cart.add(aid, 1, "", afl.length ? afl[0] : "");
+        toast("Agregado: " + (ap ? ap.name : "")); return;
+      }
       var inc = e.target.closest("[data-inc]");
-      if (inc) { var id = inc.closest("[data-row]").getAttribute("data-row"); var it = Cart.find(id); Cart.setQty(id, (it ? it.qty : 0) + 1); return; }
+      if (inc) { var k = inc.closest("[data-row]").getAttribute("data-row"); var it = Cart.byKey(k); Cart.setQty(k, (it ? it.qty : 0) + 1); return; }
       var dec = e.target.closest("[data-dec]");
-      if (dec) { var id2 = dec.closest("[data-row]").getAttribute("data-row"); var it2 = Cart.find(id2); Cart.setQty(id2, (it2 ? it2.qty : 1) - 1); return; }
+      if (dec) { var k2 = dec.closest("[data-row]").getAttribute("data-row"); var it2 = Cart.byKey(k2); Cart.setQty(k2, (it2 ? it2.qty : 1) - 1); return; }
       var rm = e.target.closest("[data-remove]");
       if (rm) { Cart.remove(rm.closest("[data-row]").getAttribute("data-row")); return; }
       if (e.target.closest("[data-cart-open]")) { e.preventDefault(); openCart(); return; }
