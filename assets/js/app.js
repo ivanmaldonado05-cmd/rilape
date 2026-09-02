@@ -81,13 +81,13 @@
       var onScroll = function () { h.classList.toggle("scrolled", window.scrollY > 8); };
       onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
     }
-    var toggle = $("[data-nav-toggle]"), nav = $("[data-nav]"), scrim = $("[data-scrim]");
-    if (toggle && nav) {
-      toggle.addEventListener("click", function () {
-        var open = nav.classList.toggle("open");
-        if (scrim) scrim.classList.toggle("open", open);
-      });
-    }
+    // El toggle del menú se maneja en la delegación global (initDelegation).
+  }
+  function toggleNav() {
+    var nav = $("[data-nav]"), scrim = $("[data-scrim]");
+    if (!nav) return;
+    var open = nav.classList.toggle("open");
+    if (scrim) scrim.classList.toggle("open", open);
   }
 
   /* ---------- overlays open/close ---------- */
@@ -384,6 +384,7 @@
   /* ---------- global click delegation ---------- */
   function initDelegation() {
     document.addEventListener("click", function (e) {
+      if (e.target.closest("[data-nav-toggle]")) { toggleNav(); return; }
       var open = e.target.closest("[data-open]");
       if (open) { openModal(open.getAttribute("data-open")); return; }
       var add = e.target.closest("[data-add]");
