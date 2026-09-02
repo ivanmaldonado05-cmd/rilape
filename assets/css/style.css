@@ -219,7 +219,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 .toolbar { position: sticky; top: var(--header-h); z-index: 90; background: rgba(246,239,228,.9);
   backdrop-filter: blur(10px); border-bottom: 1px solid var(--line-soft); padding: .85rem 0; }
 .toolbar__row { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
-.chips { display: flex; gap: .5rem; flex-wrap: wrap; flex: 1; }
+.chips { display: flex; gap: .5rem; flex-wrap: wrap; flex: 1 1 100%; }
 .chip {
   border: 1px solid var(--line); background: var(--ivory); color: var(--ink-soft);
   border-radius: 999px; padding: .5em 1.05em; font-size: .76rem; letter-spacing: .04em;
@@ -230,7 +230,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
 .search { position: relative; display: flex; align-items: center; }
 .search input {
   font-family: inherit; font-size: .86rem; border: 1px solid var(--line); background: var(--ivory);
-  border-radius: 999px; padding: .6em 1em .6em 2.4em; width: 210px; color: var(--ink); transition: border-color .2s;
+  border-radius: 999px; padding: .6em 1em .6em 2.4em; width: 320px; color: var(--ink); transition: border-color .2s;
 }
 .search input:focus { outline: none; border-color: var(--gold); }
 .search svg { position: absolute; left: .85em; width: 16px; height: 16px; color: var(--ink-faint); }
@@ -277,7 +277,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.1; 
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
           mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); }
 .cta-slide img { -webkit-user-drag: none; user-select: none; }
-.cta-marquee { display: flex; flex-direction: column; gap: 18px; animation: cta-scroll 34s linear infinite; will-change: transform; }
+.cta-marquee { display: flex; flex-direction: column; gap: 18px; animation: cta-scroll 18s linear infinite; will-change: transform; }
 .cta-slide { position: relative; background: var(--ivory); border: 1px solid var(--line-soft);
   border-radius: var(--radius); aspect-ratio: 5/4; display: flex; align-items: center; justify-content: center;
   padding: 9% 12% 15%; box-shadow: var(--shadow-sm); }
