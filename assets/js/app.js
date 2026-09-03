@@ -356,13 +356,33 @@
     host.innerHTML = feat.map(cardHtml).join("");
   }
   function initCtaCarousel() {
-    var host = $("[data-cta-carousel]"); if (!host) return;
-    var feat = D.products.filter(function (p) { return p.feat; }).slice(0, 6);
-    if (feat.length < 3) feat = D.products.slice(0, 6);
-    var block = feat.map(function (p) {
-      return '<div class="cta-slide">' + imgTag(p) + '<span>' + esc(p.name) + '</span></div>';
-    }).join("");
-    host.innerHTML = block + block; // duplicado para loop continuo
+    var track = $("[data-cta-carousel]"), scroller = $("[data-cta-scroll]");
+    if (!track || !scroller) return;
+    var feat = D.products.filter(function (p) { return p.feat; });
+    if (feat.length < 4) feat = D.products.slice(0, 8);
+    feat = feat.slice(0, 8);
+    var cards = feat.map(cardHtml).join("");
+    track.innerHTML = cards + cards; // duplicado para loop continuo
+    // respeta "reducir movimiento"
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var paused = false;
+    var pause = function () { paused = true; };
+    var resumeSoon = function () { setTimeout(function () { paused = false; }, 1200); };
+    scroller.addEventListener("mouseenter", pause);
+    scroller.addEventListener("mouseleave", function () { paused = false; });
+    scroller.addEventListener("pointerdown", pause);
+    scroller.addEventListener("pointerup", resumeSoon);
+    scroller.addEventListener("touchstart", pause, { passive: true });
+    scroller.addEventListener("touchend", resumeSoon, { passive: true });
+    function tick() {
+      if (!paused) {
+        scroller.scrollLeft += 0.7;
+        var half = scroller.scrollWidth / 2;
+        if (half > 0 && scroller.scrollLeft >= half) scroller.scrollLeft -= half;
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
   function initCategoryCards() {
     var host = $("[data-cat-cards]"); if (!host) return;
