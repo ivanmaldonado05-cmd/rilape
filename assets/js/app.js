@@ -365,21 +365,11 @@
     track.innerHTML = cards + cards; // duplicado para loop continuo
     // respeta "reducir movimiento"
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var paused = false;
-    var pause = function () { paused = true; };
-    var resumeSoon = function () { setTimeout(function () { paused = false; }, 1200); };
-    scroller.addEventListener("mouseenter", pause);
-    scroller.addEventListener("mouseleave", function () { paused = false; });
-    scroller.addEventListener("pointerdown", pause);
-    scroller.addEventListener("pointerup", resumeSoon);
-    scroller.addEventListener("touchstart", pause, { passive: true });
-    scroller.addEventListener("touchend", resumeSoon, { passive: true });
+    // se mueve siempre, sin pausar (ni hover ni touch)
     function tick() {
-      if (!paused) {
-        scroller.scrollLeft += 0.7;
-        var half = scroller.scrollWidth / 2;
-        if (half > 0 && scroller.scrollLeft >= half) scroller.scrollLeft -= half;
-      }
+      scroller.scrollLeft += 0.7;
+      var half = scroller.scrollWidth / 2;
+      if (half > 0 && scroller.scrollLeft >= half) scroller.scrollLeft -= half;
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
